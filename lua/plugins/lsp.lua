@@ -8,9 +8,14 @@ local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
 -- On NixOS, install these via extraPackages or per-project devShells
 local mason_ensure_installed = {
   "lua_ls",       -- Neovim config
-  "nil_ls",       -- Nix
+  "nil_ls",       -- Nix (nixd not available in Mason)
   "bashls",       -- Shell scripts
   "jsonls",       -- JSON configs
+  "html",         -- HTML
+  "cssls",        -- CSS
+  "marksman",     -- Markdown
+  "taplo",        -- TOML
+  "yamlls",       -- YAML
 }
 
 return {

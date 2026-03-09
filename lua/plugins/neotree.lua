@@ -20,9 +20,37 @@ return {
 							local win = vim.api.nvim_get_current_win()
 							vim.wo[win].winfixwidth = true
 							vim.wo[win].winfixbuf = true
+							vim.wo[win].cursorline = true
 						end
 					},
 				},
+			})
+
+			-- Set up cursorline highlight for neo-tree (green text on dark bg)
+			vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#313244", fg = "#a6e3a1" })
+
+			-- Apply highlight and re-apply on colorscheme change
+			vim.api.nvim_create_autocmd({ "FileType", "ColorScheme" }, {
+				pattern = { "neo-tree", "*" },
+				callback = function(ev)
+					if ev.event == "ColorScheme" then
+						vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#313244", fg = "#a6e3a1" })
+					end
+					if vim.bo.filetype == "neo-tree" then
+						vim.wo.winhighlight = "CursorLine:NeoTreeCursorLine"
+					end
+				end,
+			})
+
+			-- Lock cursor to leftmost column in neo-tree
+			vim.api.nvim_create_autocmd("CursorMoved", {
+				pattern = "neo-tree*",
+				callback = function()
+					local col = vim.api.nvim_win_get_cursor(0)[2]
+					if col ~= 0 then
+						vim.api.nvim_win_set_cursor(0, { vim.api.nvim_win_get_cursor(0)[1], 0 })
+					end
+				end,
 			})
 
 			local function toggle_neotree()

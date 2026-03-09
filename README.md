@@ -27,7 +27,16 @@ On NixOS, LSPs come from:
 - `neovim.extraPackages` (global essentials)
 - Project `devShell` (project-specific)
 
-On other systems, Mason installs: `lua_ls`, `bashls`, `jsonls`
+On other systems, Mason auto-installs:
+- `lua_ls` - Lua/Neovim
+- `nil_ls` - Nix
+- `bashls` - Bash/Shell
+- `jsonls` - JSON
+- `html` - HTML
+- `cssls` - CSS
+- `marksman` - Markdown
+- `taplo` - TOML
+- `yamlls` - YAML
 
 The smart picker (`<leader>css`) scans all lspconfig servers and shows only those with binaries installed.
 

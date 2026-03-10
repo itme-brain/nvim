@@ -9,6 +9,21 @@ return {
 		config = function()
 			require("neo-tree").setup({
         enable_diagnostics = false,
+				default_component_configs = {
+					git_status = {
+						symbols = {
+							added     = "+",
+							modified  = "~",
+							deleted   = "-",
+							renamed   = ">",
+							untracked = "?",
+							ignored   = "!",
+							unstaged  = "U",
+							staged    = "S",
+							conflict  = "C",
+						},
+					},
+				},
 				window = {
 					position = "left",
 					width = 20,

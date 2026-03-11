@@ -146,6 +146,7 @@ return {
         virtual_text = {
           prefix = '●',
           spacing = 2,
+          current_line = true;
         },
         float = {
           border = 'rounded',

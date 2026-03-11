@@ -141,6 +141,39 @@ return {
     config = function()
       local lspconfig = require('lspconfig')
 
+      -- Diagnostic display configuration
+      vim.diagnostic.config({
+        virtual_text = {
+          prefix = '●',
+          spacing = 2,
+        },
+        float = {
+          border = 'rounded',
+          source = true,
+        },
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '',
+            [vim.diagnostic.severity.WARN] = '',
+            [vim.diagnostic.severity.INFO] = '',
+            [vim.diagnostic.severity.HINT] = '',
+          },
+        },
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+      })
+
+      -- Add border to hover and signature help windows
+      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
+        vim.lsp.handlers.hover,
+        { border = 'rounded' }
+      )
+      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
+        vim.lsp.handlers.signature_help,
+        { border = 'rounded' }
+      )
+
       -- Get all known server names by scanning lspconfig's lsp directory
       local function get_all_servers()
         local servers = {}

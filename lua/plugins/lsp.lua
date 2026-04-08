@@ -141,6 +141,23 @@ return {
     config = function()
       local lspconfig = require('lspconfig')
 
+      -- Neovim 0.12 exposes built-in :lsp commands and skips lspconfig's legacy
+      -- :Lsp* aliases. Recreate the old names so existing mappings keep working.
+      if vim.fn.exists(':lsp') == 2 and vim.fn.exists(':LspStart') == 0 then
+        vim.api.nvim_create_user_command('LspStart', function(info)
+          vim.cmd('lsp enable ' .. table.concat(info.fargs, ' '))
+        end, { nargs = '*' })
+
+        vim.api.nvim_create_user_command('LspRestart', function(info)
+          vim.cmd('lsp restart ' .. table.concat(info.fargs, ' '))
+        end, { nargs = '*', bang = true })
+
+        vim.api.nvim_create_user_command('LspStop', function(info)
+          local suffix = info.bang and '!' or ''
+          vim.cmd('lsp stop' .. suffix .. ' ' .. table.concat(info.fargs, ' '))
+        end, { nargs = '*', bang = true })
+      end
+
       -- Diagnostic display configuration
       vim.diagnostic.config({
         virtual_text = {
@@ -165,15 +182,20 @@ return {
         severity_sort = true,
       })
 
-      -- Add border to hover and signature help windows
-      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
-        vim.lsp.handlers.hover,
-        { border = 'rounded' }
-      )
-      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
-        vim.lsp.handlers.signature_help,
-        { border = 'rounded' }
-      )
+      -- Add border to hover and signature help windows.
+      local hover_handler = vim.lsp.handlers.hover
+      vim.lsp.handlers['textDocument/hover'] = function(err, result, ctx, config)
+        return hover_handler(err, result, ctx, vim.tbl_extend('force', config or {}, {
+          border = 'rounded',
+        }))
+      end
+
+      local signature_help_handler = vim.lsp.handlers.signature_help
+      vim.lsp.handlers['textDocument/signatureHelp'] = function(err, result, ctx, config)
+        return signature_help_handler(err, result, ctx, vim.tbl_extend('force', config or {}, {
+          border = 'rounded',
+        }))
+      end
 
       -- Get all known server names by scanning lspconfig's lsp directory
       local function get_all_servers()
@@ -246,8 +268,7 @@ return {
         table.sort(matching)
 
         local function start_server(server)
-          vim.lsp.enable(server)  -- Register on-demand
-          vim.cmd('LspStart ' .. server)
+          vim.lsp.enable(server)
         end
 
         if #matching == 0 then
@@ -270,9 +291,9 @@ return {
         { "<leader>cs",  group = "LSP Commands" },
         { "<leader>cf",  function() vim.lsp.buf.format() end, desc = "Code Format" },
         { "<leader>csi", ":checkhealth vim.lsp<CR>",          desc = "LSP Info" },
-        { "<leader>csr", ":LspRestart<CR>",                   desc = "LSP Restart" },
+        { "<leader>csr", ":lsp restart<CR>",                  desc = "LSP Restart" },
         { "<leader>css", lsp_start_smart,                     desc = "LSP Start" },
-        { "<leader>csx", ":LspStop<CR>",                      desc = "LSP Stop" },
+        { "<leader>csx", ":lsp stop<CR>",                     desc = "LSP Stop" },
       })
     end
   },

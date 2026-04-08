@@ -41,15 +41,15 @@ return {
 				},
 			})
 
-			-- Set up cursorline highlight for neo-tree (green text on dark bg)
-			vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#313244", fg = "#a6e3a1" })
+			-- Keep the selected entry readable without a solid row background.
+			vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "NONE", fg = "#a6e3a1" })
 
 			-- Apply highlight and re-apply on colorscheme change
 			vim.api.nvim_create_autocmd({ "FileType", "ColorScheme" }, {
 				pattern = { "neo-tree", "*" },
 				callback = function(ev)
 					if ev.event == "ColorScheme" then
-						vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#313244", fg = "#a6e3a1" })
+						vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "NONE", fg = "#a6e3a1" })
 					end
 					local win = vim.api.nvim_get_current_win()
 					local buf = vim.api.nvim_win_get_buf(win)

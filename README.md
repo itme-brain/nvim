@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-Portable Neovim configuration using lazy.nvim and native LSP (Neovim 0.11+).
+Portable Neovim configuration using lazy.nvim and native LSP (Neovim 0.11+, tested on 0.12.1).
 
 ## Installation
 
@@ -16,8 +16,9 @@ git clone --recurse-submodules git@github.com:itme-brain/nixos.git
 
 ## Features
 
-- **Native LSP** (`vim.lsp.config`) - no manual server list needed
+- **Native LSP** (`vim.lsp.config` / `vim.lsp.enable`) - no manual server list needed
 - **Smart LSP picker** (`<leader>css`) - auto-detects installed servers for current filetype
+- **Neovim 0.12 compatible** - uses built-in `:lsp` commands and keeps legacy `:Lsp*` aliases working
 - **Portable** - works on NixOS (LSPs via extraPackages) or any system (LSPs via Mason)
 - **Mason** - auto-disabled on NixOS, auto-installs essentials elsewhere
 
@@ -39,6 +40,7 @@ On other systems, Mason auto-installs:
 - `yamlls` - YAML
 
 The smart picker (`<leader>css`) scans all lspconfig servers and shows only those with binaries installed.
+On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the hood.
 
 ## Key Bindings
 
@@ -54,8 +56,8 @@ The smart picker (`<leader>css`) scans all lspconfig servers and shows only thos
 | `<leader>gr` | Find references |
 | `<leader>e` | Toggle file explorer |
 | `<leader>bd` | Delete buffer |
-| `<leader>/` | Live grep |
-| `<leader>ff` | Find files |
+| `<leader>/` | Live grep from git root |
+| `<leader>ff` | Find files from git root |
 
 ## Plugins
 

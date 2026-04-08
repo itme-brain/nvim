@@ -1,69 +1,93 @@
 return {
-	{
-		"chriskempson/base16-vim",
-		config = function()
-			vim.cmd("colorscheme base16-onedark")
-			vim.cmd([[
-				hi Normal guibg=NONE ctermbg=NONE guifg=#FFFFFF
-        hi Visual ctermbg=Gray ctermfg=Black guibg=Gray guifg=Black
-				hi NonText guibg=NONE ctermbg=NONE
-				hi LineNr guibg=NONE ctermbg=NONE
-				hi CursorLine guibg=NONE ctermbg=NONE
-				hi CursorLineNr guibg=NONE ctermbg=NONE guifg=#E5C07B ctermfg=Yellow cterm=bold
-        hi Search ctermfg=Black guifg=#000000 ctermbg=Gray guibg=#FFCC66
-        hi Pmenu ctermbg=Black ctermfg=White cterm=NONE guibg=Black guifg=White gui=NONE
-        hi PmenuSel ctermbg=Green ctermfg=Black cterm=NONE guibg=Green guifg=Black gui=NONE
-        hi PmenuThumb ctermbg=Green guibg=Green
-        hi PmenuSbar ctermbg=Black guibg=Black
-        hi WinSeparator guibg=NONE ctermbg=NONE
+  {
+    "chriskempson/base16-vim",
+    config = function()
+      local color_group = vim.api.nvim_create_augroup("config_colorscheme", { clear = true })
 
-				hi GitGutterChange guibg=NONE ctermbg=NONE
-				hi GitGutterAdd guibg=NONE ctermbg=NONE
-				hi GitGutterDelete guibg=NONE ctermbg=NONE
-        hi SignColumn ctermbg=NONE guibg=NONE
+      local highlights = {
+        Normal = { bg = "NONE", fg = "#FFFFFF" },
+        Visual = { bg = "Gray", fg = "Black" },
+        NonText = { bg = "NONE" },
+        LineNr = { bg = "NONE" },
+        CursorLine = { bg = "NONE" },
+        CursorLineNr = { bg = "NONE", fg = "#E5C07B", bold = true },
+        Search = { bg = "#FFCC66", fg = "#000000" },
+        Pmenu = { bg = "Black", fg = "White" },
+        PmenuSel = { bg = "Green", fg = "Black" },
+        PmenuThumb = { bg = "Green" },
+        PmenuSbar = { bg = "Black" },
+        WinSeparator = { bg = "NONE" },
+        GitGutterChange = { bg = "NONE" },
+        GitGutterAdd = { bg = "NONE" },
+        GitGutterDelete = { bg = "NONE" },
+        SignColumn = { bg = "NONE" },
+        TelescopeSelection = { bg = "Gray", fg = "Green", bold = true },
+        TelescopePreviewMatch = { bg = "Yellow", fg = "Black" },
+        TreesitterContext = { bg = "NONE" },
+        LazyH1 = { bg = "Black", fg = "Green" },
+        IblScope = { bg = "NONE", fg = "Yellow" },
+        ConflictMarker = { fg = "red" },
+        DiffAdd = { bg = "NONE" },
+        DiffChange = { bg = "NONE" },
+        DiffDelete = { bg = "NONE" },
+        DiffText = { bg = "NONE" },
+        BufferLineFill = { bg = "NONE" },
+        BufferLineBackground = { bg = "NONE", fg = "#5c6370" },
+        BufferLineBuffer = { bg = "NONE", fg = "#5c6370" },
+        BufferLineBufferSelected = { bg = "NONE", fg = "#FFFFFF", bold = true },
+        BufferLineBufferVisible = { bg = "NONE", fg = "#abb2bf" },
+        BufferLineCloseButton = { bg = "NONE", fg = "#5c6370" },
+        BufferLineCloseButtonSelected = { bg = "NONE", fg = "#e06c75" },
+        BufferLineCloseButtonVisible = { bg = "NONE", fg = "#5c6370" },
+        BufferLineModified = { bg = "NONE", fg = "#e5c07b" },
+        BufferLineModifiedSelected = { bg = "NONE", fg = "#e5c07b" },
+        BufferLineModifiedVisible = { bg = "NONE", fg = "#e5c07b" },
+        BufferLineSeparator = { bg = "NONE", fg = "#3e4452" },
+        BufferLineSeparatorSelected = { bg = "NONE", fg = "#3e4452" },
+        BufferLineSeparatorVisible = { bg = "NONE", fg = "#3e4452" },
+        BufferLineIndicatorSelected = { bg = "NONE", fg = "#61afef" },
+        YankHighlight = { bg = "yellow", fg = "black" },
+      }
 
-        hi TelescopeSelection guibg=Gray guifg=Green gui=bold ctermbg=Black ctermfg=Green cterm=bold
-        hi TelescopePreviewMatch ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black
+      local function apply_highlights()
+        for group, spec in pairs(highlights) do
+          vim.api.nvim_set_hl(0, group, spec)
+        end
+      end
 
-        hi TreesitterContext guibg=NONE ctermbg=NONE
+      local conflict_pattern = [[<<<<<<< HEAD\|=======\|>>>>>>> .\+]]
+      local function apply_conflict_match(win)
+        if vim.w[win].conflict_marker_match_id then
+          pcall(vim.fn.matchdelete, vim.w[win].conflict_marker_match_id, win)
+        end
+        vim.w[win].conflict_marker_match_id = vim.fn.matchadd("ConflictMarker", conflict_pattern, 10, -1, {
+          window = win,
+        })
+      end
 
-        hi LazyH1 ctermbg=Green ctermfg=Black guibg=Black guifg=Green
-        hi IblScope guibg=NONE guifg=Yellow ctermbg=NONE ctermfg=Yellow
-        
-        hi ConflictMarker ctermfg=red guifg=red
-        match ConflictMarker /<<<<<<< HEAD\|=======\|>>>>>>> .\+/
+      vim.cmd.colorscheme("base16-onedark")
+      apply_highlights()
 
-        hi DiffAdd ctermbg=none guibg=none
-        hi DiffChange ctermbg=none guibg=none
-        hi DiffDelete ctermbg=none guibg=none
-        hi DiffText ctermbg=none guibg=none
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = color_group,
+        callback = apply_highlights,
+      })
 
-        " Bufferline - dark background, readable text
-        hi BufferLineFill guibg=NONE ctermbg=NONE
-        hi BufferLineBackground guibg=NONE ctermbg=NONE guifg=#5c6370 ctermfg=Gray
-        hi BufferLineBuffer guibg=NONE ctermbg=NONE guifg=#5c6370 ctermfg=Gray
-        hi BufferLineBufferSelected guibg=NONE ctermbg=NONE guifg=#FFFFFF ctermfg=White gui=bold cterm=bold
-        hi BufferLineBufferVisible guibg=NONE ctermbg=NONE guifg=#abb2bf ctermfg=White
-        hi BufferLineCloseButton guibg=NONE ctermbg=NONE guifg=#5c6370 ctermfg=Gray
-        hi BufferLineCloseButtonSelected guibg=NONE ctermbg=NONE guifg=#e06c75 ctermfg=Red
-        hi BufferLineCloseButtonVisible guibg=NONE ctermbg=NONE guifg=#5c6370 ctermfg=Gray
-        hi BufferLineModified guibg=NONE ctermbg=NONE guifg=#e5c07b ctermfg=Yellow
-        hi BufferLineModifiedSelected guibg=NONE ctermbg=NONE guifg=#e5c07b ctermfg=Yellow
-        hi BufferLineModifiedVisible guibg=NONE ctermbg=NONE guifg=#e5c07b ctermfg=Yellow
-        hi BufferLineSeparator guibg=NONE ctermbg=NONE guifg=#3e4452 ctermfg=DarkGray
-        hi BufferLineSeparatorSelected guibg=NONE ctermbg=NONE guifg=#3e4452 ctermfg=DarkGray
-        hi BufferLineSeparatorVisible guibg=NONE ctermbg=NONE guifg=#3e4452 ctermfg=DarkGray
-        hi BufferLineIndicatorSelected guibg=NONE ctermbg=NONE guifg=#61afef ctermfg=Blue
-			]])
+      vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
+        group = color_group,
+        callback = function(event)
+          apply_conflict_match(vim.api.nvim_get_current_win())
+        end,
+      })
 
       vim.api.nvim_create_autocmd("TextYankPost", {
+        group = color_group,
         callback = function()
-          vim.cmd("highlight YankHighlight ctermbg=yellow ctermfg=black guibg=yellow guifg=black")
           vim.highlight.on_yank({ higroup = "YankHighlight", timeout = 150 })
         end,
       })
-		end,
-	},
+    end,
+  },
 
   {
     "folke/todo-comments.nvim",

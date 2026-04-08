@@ -51,8 +51,10 @@ return {
 					if ev.event == "ColorScheme" then
 						vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#313244", fg = "#a6e3a1" })
 					end
-					if vim.bo.filetype == "neo-tree" then
-						vim.wo.winhighlight = "CursorLine:NeoTreeCursorLine"
+					local win = vim.api.nvim_get_current_win()
+					local buf = vim.api.nvim_win_get_buf(win)
+					if vim.bo[buf].filetype == "neo-tree" then
+						vim.wo[win].winhighlight = "CursorLine:NeoTreeCursorLine"
 					end
 				end,
 			})
@@ -75,12 +77,12 @@ return {
 				for _, buf in ipairs(bufs) do
 					local name = api.nvim_buf_get_name(buf)
 					if name:match("neo%-tree filesystem") then
-						api.nvim_command(":Neotree close")
+						vim.cmd("Neotree close")
 						return
 					end
 				end
 
-				api.nvim_command(":Neotree")
+				vim.cmd("Neotree")
 			end
 
       require("which-key").add({

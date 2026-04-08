@@ -201,9 +201,11 @@ return {
       local function get_all_servers()
         local servers = {}
         local lsp_path = vim.fn.stdpath('data') .. '/lazy/nvim-lspconfig/lsp'
-        local files = vim.fn.globpath(lsp_path, '*.lua', false, true)
+        local files = vim.fn.readdir(lsp_path, function(name)
+          return name:sub(-4) == '.lua'
+        end)
         for _, file in ipairs(files) do
-          local server = vim.fn.fnamemodify(file, ':t:r')
+          local server = file:sub(1, -5)
           table.insert(servers, server)
         end
         return servers

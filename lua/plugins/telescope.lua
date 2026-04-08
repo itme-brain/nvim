@@ -1,10 +1,13 @@
 local function get_root()
-  local git_dir = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-  if git_dir and git_dir ~= "" then
-    return git_dir
-  else
-    return vim.fn.getcwd()  -- Fallback to current working directory if not in a Git repo
+  local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
+  if result.code == 0 and result.stdout then
+    local git_dir = vim.trim(result.stdout)
+    if git_dir ~= "" then
+      return git_dir
+    end
   end
+
+  return vim.fn.getcwd()
 end
 
 return {
@@ -22,8 +25,10 @@ return {
             require('telescope.builtin').live_grep({ cwd = get_root() })
           end,
           desc = "grep" },
-        { "<leader>/", ":Telescope live_grep<CR>", desc = "grep" },
-        { "<leader>ff", ":Telescope fd<CR>", desc = "Search for Files" },
+        { "<leader>ff", function()
+            require('telescope.builtin').find_files({ cwd = get_root() })
+          end,
+          desc = "Search for Files" },
         { "<leader>fp", ":Telescope oldfiles<CR>", desc = "Oldfiles" },
         { "<leader>?", ":Telescope command_history<CR>", desc = "Command History" },
         { "<leader>cm", ":Telescope man_pages<CR>", desc = "Manpages" },
@@ -35,14 +40,14 @@ return {
             if next(attached) ~= nil then
               require('telescope.builtin').lsp_definitions()
             else
-              vim.api.nvim_command('normal! gd')
+              vim.api.nvim_feedkeys("gd", "n", false)
             end
           end,
           mode = "n",
           desc = "Go to Definition"
         },
         { "<leader>gd", ":Telescope lsp_definitions<CR>", desc = "Go to Definition" },
-        { "<leader>gr", ":Telescope lsp_references", desc = "Goto References" },
+        { "<leader>gr", ":Telescope lsp_references<CR>", desc = "Goto References" },
         { "<leader>gi", ":Telescope lsp_implementations<CR>", desc = "Go to Implementations" },
         { "<leader>gt", ":Telescope lsp_type_definitions<CR>", desc = "Go to Type Definition" },
         { "<leader>cv", ":Telescope treesitter<CR>", desc = "Function Names & Variables" },

@@ -26,10 +26,23 @@ vim.opt.guicursor = "n-v-c:block,i:block,r:block"
 
 vim.opt.fillchars = { eob = " " }
 
-vim.cmd([[
-  autocmd FileType python,haskell,c,cpp setlocal tabstop=4 shiftwidth=4 softtabstop=4
-]])
+local options_group = vim.api.nvim_create_augroup("config_options", { clear = true })
 
-vim.cmd([[
-  au BufRead,BufNewFile *.purs set filetype=purescript
-]])
+vim.api.nvim_create_autocmd("FileType", {
+  group = options_group,
+  pattern = { "python", "haskell", "c", "cpp" },
+  callback = function()
+    local opt = vim.opt_local
+    opt.tabstop = 4
+    opt.shiftwidth = 4
+    opt.softtabstop = 4
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  group = options_group,
+  pattern = "*.purs",
+  callback = function(event)
+    vim.bo[event.buf].filetype = "purescript"
+  end,
+})

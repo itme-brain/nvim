@@ -18,13 +18,40 @@ local mason_ensure_installed = {
   "yamlls",       -- YAML
 }
 
+local treesitter_parsers = {
+  "lua",
+  "c",
+  "cpp",
+  "python",
+  "nix",
+  "rust",
+  "bash",
+  "markdown",
+  "html",
+  "html_tags",
+  "javascript",
+  "ecma",
+  "jsx",
+  "css",
+  "vim",
+  "git_config",
+  "git_rebase",
+  "gitattributes",
+  "gitcommit",
+  "gitignore",
+}
+
 return {
   {
-    "nvim-treesitter/nvim-treesitter",
+    "neovim-treesitter/nvim-treesitter",
+    name = "nvim-treesitter",
+    dependencies = { "neovim-treesitter/treesitter-parser-registry" },
+    lazy = false,
     build = ":TSUpdate",
-    config = function()
-      require('nvim-treesitter.configs').setup({
-        ensure_installed = {
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("config_treesitter", { clear = true }),
+        pattern = {
           "lua",
           "c",
           "cpp",
@@ -35,22 +62,47 @@ return {
           "markdown",
           "html",
           "javascript",
+          "javascriptreact",
           "css",
-
           "vim",
-
-          "git_config",
-          "git_rebase",
+          "gitconfig",
+          "gitrebase",
           "gitattributes",
           "gitcommit",
-          "gitignore"
+          "gitignore",
         },
-        auto_install = true,
-        sync_install = true,
-        highlight = {
-          enable = true,
-        }
+        callback = function(event)
+          if pcall(vim.treesitter.start, event.buf) then
+            vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+            vim.wo.foldmethod = "expr"
+            vim.bo[event.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
+    end,
+    config = function()
+      require("nvim-treesitter").setup()
+
+      local installed = require("nvim-treesitter.config").get_installed()
+      local missing = vim.iter(treesitter_parsers)
+          :filter(function(parser)
+            return not vim.tbl_contains(installed, parser)
+          end)
+          :totable()
+
+      if #missing == 0 then
+        return
+      end
+
+      if vim.fn.executable("tree-sitter") == 0 then
+        vim.notify_once(
+          "tree-sitter CLI is required to install or update parsers; enter a Nix shell that provides tree-sitter before running :TSUpdate",
+          vim.log.levels.WARN
+        )
+        return
+      end
+
+      require("nvim-treesitter").install(missing)
     end
   },
 
@@ -302,7 +354,7 @@ return {
 
   {
     "taproot-wizards/bitcoin-script-hints.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    dependencies = { "nvim-treesitter" },
     config = function()
       require("bitcoin-script-hints").setup()
     end

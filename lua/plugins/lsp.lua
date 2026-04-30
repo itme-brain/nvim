@@ -23,10 +23,10 @@ local treesitter_parsers = {
   "rust",
   "bash",
   "markdown",
+  "markdown_inline",
   "html",
   "html_tags",
   "javascript",
-  "ecma",
   "jsx",
   "css",
   "vim",
@@ -198,58 +198,6 @@ return {
     end
   },
 
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      {
-        "L3MON4D3/LuaSnip",
-        version = "v2.*",
-        build = "make install_jsregexp",
-      },
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp"
-    },
-
-    config = function()
-      local cmp = require("cmp")
-      cmp.setup({
-        enabled = function()
-          local context = require("cmp.config.context")
-          if vim.api.nvim_get_mode().mode == "c" then
-            return true
-          else
-            return not context.in_treesitter_capture("comment") and not context.in_syntax_group("comment")
-          end
-        end,
-
-        snippet = {
-          expand = function(args)
-            require('luasnip').lsp_expand(args.body)
-          end
-        },
-
-        mapping = cmp.mapping.preset.insert({
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<C-y>"] = cmp.mapping.confirm(),
-          ["<CR>"] = cmp.mapping(function(fallback)
-            fallback()
-          end, { "i", "s" }),
-        }),
-
-        sources = cmp.config.sources({
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-        }, {
-          { name = 'buffer' }
-        }),
-      })
-    end
-  },
-
   -- Mason: portable LSP installer. On NixOS this requires nix-ld for
   -- downloaded Linux binaries to run.
   {
@@ -272,7 +220,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
     },
     config = function()
       local lspconfig = require('lspconfig')
@@ -349,18 +297,12 @@ return {
 
       local all_servers = get_all_servers()
 
-      -- local navic = require('nvim-navic')
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Global config applied to all servers
       vim.lsp.config('*', {
         autostart = false,  -- Don't auto-attach, use <leader>css to start manually
         capabilities = capabilities,
-        -- on_attach = function(client, bufnr)
-        --   if client.server_capabilities.documentSymbolProvider then
-        --     navic.attach(client, bufnr)
-        --   end
-        -- end,
       })
 
       -- Server-specific settings (merged with lspconfig defaults)

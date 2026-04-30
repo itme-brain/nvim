@@ -7,7 +7,7 @@ return {
         { "<leader>l", ":Lazy<CR>", desc = "Lazy" },
         { "<leader>t",
           function()
-            vim.cmd.botright("new")
+            vim.cmd("botright new")
             vim.opt_local.number = false
             vim.opt_local.relativenumber = false
             vim.cmd.resize(10)
@@ -28,39 +28,18 @@ return {
 
         { "<leader>b", group = "Buffers"},
         { "<leader>bd", function()
-            local function is_neotree(bufnr)
-              return vim.bo[bufnr].filetype == "neo-tree"
-            end
-
             local current_buf = vim.api.nvim_get_current_buf()
-
-            -- Skip if in neo-tree
-            if is_neotree(current_buf) then
-              vim.notify("Cannot delete buffer from neo-tree", vim.log.levels.WARN)
-              return
-            end
             local buflisted = vim.fn.getbufinfo({ buflisted = 1 })
-            -- Prevent deleting last buffer
             if #buflisted <= 1 then
               vim.notify("Cannot delete last buffer", vim.log.levels.WARN)
               return
             end
             vim.cmd.bprevious()
             vim.cmd.bdelete({ args = { tostring(current_buf) } })
-            -- If we ended up in neo-tree, move back to a regular window
-            local new_buf = vim.api.nvim_get_current_buf()
-            if is_neotree(new_buf) then
-              vim.cmd.wincmd("l")
-            end
           end, desc = "Delete Buffer" },
         { "<leader>bD", function()
             local current_buf = vim.api.nvim_get_current_buf()
             local current_win = vim.api.nvim_get_current_win()
-
-            if vim.bo[current_buf].filetype == "neo-tree" then
-              vim.notify("Cannot delete neo-tree buffer", vim.log.levels.WARN)
-              return
-            end
 
             local wins = vim.fn.win_findbuf(current_buf)
             if #wins > 1 then

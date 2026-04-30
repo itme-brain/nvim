@@ -1,60 +1,70 @@
 return {
   {
-    "chriskempson/base16-vim",
+    "https://codeberg.org/juanmilkah/anticuus.nvim",
+    name = "anticuus",
+    lazy = false,
+    priority = 1000,
     config = function()
       local color_group = vim.api.nvim_create_augroup("config_colorscheme", { clear = true })
 
+      vim.cmd.colorscheme("anticuus")
+
       local highlights = {
-        Normal = { bg = "NONE", fg = "#FFFFFF" },
-        Visual = { bg = "Gray", fg = "Black" },
-        NonText = { bg = "NONE" },
-        LineNr = { bg = "NONE" },
-        CursorLine = { bg = "NONE" },
-        CursorLineNr = { bg = "NONE", fg = "#E5C07B", bold = true },
-        Search = { bg = "#FFCC66", fg = "#000000" },
-        Pmenu = { bg = "Black", fg = "White" },
-        PmenuSel = { bg = "Green", fg = "Black" },
-        PmenuThumb = { bg = "Green" },
-        PmenuSbar = { bg = "Black" },
-        WinSeparator = { bg = "NONE" },
-        GitGutterChange = { bg = "NONE" },
-        GitGutterAdd = { bg = "NONE" },
-        GitGutterDelete = { bg = "NONE" },
-        GitSignsAddNr = { bg = "NONE", fg = "#98c379" },
-        GitSignsChangeNr = { bg = "NONE", fg = "#61afef" },
-        GitSignsDeleteNr = { bg = "NONE", fg = "#e06c75" },
-        SignColumn = { bg = "NONE" },
-        NeoTreeGitAdded = { bg = "NONE", fg = "#98c379" },
-        NeoTreeGitModified = { bg = "NONE", fg = "#e5c07b" },
-        NeoTreeGitDeleted = { bg = "NONE", fg = "#e06c75" },
-        NeoTreeGitConflict = { bg = "NONE", fg = "#e06c75" },
-        NeoTreeGitUntracked = { bg = "NONE", fg = "#61afef" },
-        TelescopeSelection = { bg = "Gray", fg = "Green", bold = true },
-        TelescopePreviewMatch = { bg = "Yellow", fg = "Black" },
-        TreesitterContext = { bg = "NONE" },
-        LazyH1 = { bg = "Black", fg = "Green" },
-        IblScope = { bg = "NONE", fg = "Yellow" },
-        ConflictMarker = { fg = "red" },
-        DiffAdd = { bg = "NONE" },
-        DiffChange = { bg = "NONE" },
-        DiffDelete = { bg = "NONE" },
-        DiffText = { bg = "NONE" },
-        BufferLineFill = { bg = "NONE" },
-        BufferLineBackground = { bg = "NONE", fg = "#5c6370" },
-        BufferLineBuffer = { bg = "NONE", fg = "#5c6370" },
-        BufferLineBufferSelected = { bg = "NONE", fg = "#FFFFFF", bold = true },
-        BufferLineBufferVisible = { bg = "NONE", fg = "#abb2bf" },
-        BufferLineCloseButton = { bg = "NONE", fg = "#5c6370" },
-        BufferLineCloseButtonSelected = { bg = "NONE", fg = "#e06c75" },
-        BufferLineCloseButtonVisible = { bg = "NONE", fg = "#5c6370" },
-        BufferLineModified = { bg = "NONE", fg = "#e5c07b" },
-        BufferLineModifiedSelected = { bg = "NONE", fg = "#e5c07b" },
-        BufferLineModifiedVisible = { bg = "NONE", fg = "#e5c07b" },
-        BufferLineSeparator = { bg = "NONE", fg = "#3e4452" },
-        BufferLineSeparatorSelected = { bg = "NONE", fg = "#3e4452" },
-        BufferLineSeparatorVisible = { bg = "NONE", fg = "#3e4452" },
-        BufferLineIndicatorSelected = { bg = "NONE", fg = "#61afef" },
-        YankHighlight = { bg = "yellow", fg = "black" },
+        Comment    = { fg = "#5a5a5a", italic = true },
+        ["@comment"] = { fg = "#5a5a5a", italic = true },
+
+        Function              = { fg = "#88ddcc" },
+        ["@function"]         = { fg = "#88ddcc" },
+        ["@function.builtin"] = { fg = "#88ddcc" },
+        ["@function.method"]  = { fg = "#88ddcc" },
+
+        Type              = { fg = "#e8a060" },
+        Typedef           = { fg = "#e8a060" },
+        ["@type"]         = { fg = "#e8a060" },
+        ["@type.builtin"] = { fg = "#e8a060" },
+
+        Number   = { fg = "#c490d0" },
+        Boolean  = { fg = "#c490d0" },
+        Float    = { fg = "#c490d0" },
+        Constant = { fg = "#c490d0" },
+        ["@number"]           = { fg = "#c490d0" },
+        ["@number.float"]     = { fg = "#c490d0" },
+        ["@boolean"]          = { fg = "#c490d0" },
+        ["@constant"]         = { fg = "#c490d0" },
+        ["@constant.builtin"] = { fg = "#c490d0" },
+
+        ["@tag"]               = { fg = "#ff6b6b" },
+        ["@tag.delimiter"]     = { fg = "#ff6b6b" },
+        ["@keyword.return"]    = { fg = "#ff6b6b" },
+        ["@keyword.exception"] = { fg = "#ff6b6b" },
+
+        MatchParen = { fg = "#c490d0", bold = true, underline = true },
+
+        IncSearch = { fg = "#000000", bg = "#88ddcc" },
+        CurSearch = { fg = "#000000", bg = "#c490d0" },
+
+        DiffAdd    = { fg = "#a5d6a7", bg = "#0a2010" },
+        DiffChange = { fg = "#e8a060", bg = "#201a0a" },
+        DiffDelete = { fg = "#ff6b6b", bg = "#200a0a" },
+        DiffText   = { fg = "#ffcc00", bg = "#3a2000", bold = true },
+
+        WinBar   = { fg = "#dadada", bold = true },
+        WinBarNC = { fg = "#888888" },
+
+        ConflictMarker = { link = "DiagnosticError" },
+        YankHighlight  = { link = "Search" },
+
+        OilCreate = { link = "DiagnosticOk" },
+        OilDelete = { link = "DiagnosticError" },
+        OilMove   = { link = "DiagnosticWarn" },
+        OilCopy   = { link = "DiagnosticInfo" },
+
+        BlinkCmpLabelMatch    = { link = "Search" },
+        BlinkCmpMenuSelection = { link = "PmenuSel" },
+
+        FzfLuaTitle        = { link = "Title" },
+        FzfLuaPreviewTitle = { link = "Title" },
+        FzfLuaHeaderBind   = { link = "Special" },
       }
 
       local function apply_highlights()
@@ -73,7 +83,6 @@ return {
         })
       end
 
-      vim.cmd.colorscheme("base16-onedark")
       apply_highlights()
 
       vim.api.nvim_create_autocmd("ColorScheme", {
@@ -83,7 +92,7 @@ return {
 
       vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
         group = color_group,
-        callback = function(event)
+        callback = function()
           apply_conflict_match(vim.api.nvim_get_current_win())
         end,
       })
@@ -103,7 +112,6 @@ return {
   },
 
   {
-    "fei6409/log-highlight.nvim"
-  }
-
+    "fei6409/log-highlight.nvim",
+  },
 }

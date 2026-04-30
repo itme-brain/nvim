@@ -30,18 +30,18 @@ return {
       fzf.setup({
         keymap = {
           fzf = {
-            ["ctrl-d"] = "preview-half-page-down",
-            ["ctrl-u"] = "preview-half-page-up",
+            true,
+            ["ctrl-d"]    = "preview-half-page-down",
+            ["ctrl-u"]    = "preview-half-page-up",
+            ["tab"]       = "down",
+            ["shift-tab"] = "up",
           },
         },
         actions = {
           files = {
+            true,
             ["enter"]  = fzf_actions.file_edit,
             ["ctrl-x"] = fzf_actions.file_split,
-            ["ctrl-v"] = fzf_actions.file_vsplit,
-            ["ctrl-t"] = fzf_actions.file_tabedit,
-            ["alt-q"]  = fzf_actions.file_sel_to_qf,
-            ["alt-l"]  = fzf_actions.file_sel_to_ll,
           },
         },
       })

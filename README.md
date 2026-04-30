@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-Portable Neovim configuration using lazy.nvim and native LSP (Neovim 0.11+, tested on 0.12.1).
+Portable Neovim configuration using lazy.nvim, Mason-managed tooling, native LSP, Treesitter, Telescope, and DAP (Neovim 0.11+, tested on 0.12.1).
 
 ## Installation
 
@@ -19,16 +19,13 @@ git clone --recurse-submodules git@github.com:itme-brain/nixos.git
 - **Native LSP** (`vim.lsp.config` / `vim.lsp.enable`) - no manual server list needed
 - **Smart LSP picker** (`<leader>css`) - auto-detects installed servers for current filetype
 - **Neovim 0.12 compatible** - uses built-in `:lsp` commands and keeps legacy `:Lsp*` aliases working
-- **Portable** - works on NixOS (LSPs via extraPackages) or any system (LSPs via Mason)
-- **Mason** - auto-disabled on NixOS, auto-installs essentials elsewhere
+- **Portable** - Mason is the source of truth for LSP servers, debug adapters, and tree-sitter-cli
+- **Treesitter** - starts via Neovim's native `vim.treesitter.start`
+- **Debugging** - lazy-loaded `nvim-dap` stack with Mason-managed adapters
 
 ## LSP Setup
 
-On NixOS, LSPs come from:
-- `neovim.extraPackages` (global essentials)
-- Project `devShell` (project-specific)
-
-On other systems, Mason auto-installs:
+Mason installs the shared LSP baseline on every system:
 - `lua_ls` - Lua/Neovim
 - `nil_ls` - Nix
 - `bashls` - Bash/Shell
@@ -39,8 +36,29 @@ On other systems, Mason auto-installs:
 - `taplo` - TOML
 - `yamlls` - YAML
 
+On NixOS, Mason-installed binaries require `nix-ld` so downloaded tools can execute. The NixOS module should provide `nix-ld`; Neovim itself does not keep a separate Nix-only LSP package list.
+
 The smart picker (`<leader>css`) scans all lspconfig servers and shows only those with binaries installed.
 On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the hood.
+
+## Treesitter
+
+Treesitter uses the current `nvim-treesitter` main branch API:
+- Parsers are installed with `nvim-treesitter`
+- Highlighting starts through `vim.treesitter.start`
+- `tree-sitter-cli` is bootstrapped through Mason when needed for parser installs/updates
+
+## Debugging
+
+Debugging uses `nvim-dap`, `nvim-dap-ui`, `nvim-dap-virtual-text`, `telescope-dap.nvim`, and `mason-nvim-dap.nvim`.
+
+The DAP stack is lazy-loaded. Normal startup does not load DAP; it loads only when a `:Dap...` command runs or a `<leader>d...` mapping is used.
+
+Mason installs:
+- `debugpy` - Python
+- `codelldb` - C/C++/Rust
+- `bash-debug-adapter` - Bash
+- `js-debug-adapter` - JavaScript/TypeScript
 
 ## Key Bindings
 
@@ -58,6 +76,17 @@ On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the 
 | `<leader>bd` | Delete buffer |
 | `<leader>/` | Live grep from git root |
 | `<leader>ff` | Find files from git root |
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Set conditional breakpoint |
+| `<leader>dc` | Continue debugging |
+| `<leader>di` | Step into |
+| `<leader>do` | Step over |
+| `<leader>dO` | Step out |
+| `<leader>du` | Toggle debug UI |
+| `<leader>dt` | Terminate debug session |
+| `<leader>de` | Evaluate expression |
+| `<leader>ds` | Debug configurations |
+| `<leader>dS` | Debug breakpoints |
 
 ## Plugins
 
@@ -66,6 +95,9 @@ On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the 
 - **nvim-cmp** - completion
 - **telescope.nvim** - fuzzy finder
 - **nvim-treesitter** - syntax highlighting
+- **nvim-dap** - debug adapter client
+- **nvim-dap-ui** - debugging UI panes
+- **mason-nvim-dap.nvim** - Mason debug adapter integration
 - **neo-tree.nvim** - file explorer
 - **gitsigns.nvim** - git integration
 - **lualine.nvim** - statusline

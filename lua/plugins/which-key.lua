@@ -82,6 +82,7 @@ return {
         { "<leader>G", group = "Git"},
         { "<leader>f", group = "Files"},
         { "<leader>c", group = "Code"},
+        { "<leader>d", group = "Debug"},
         { "<leader>g", group = "Goto"},
       },
     },

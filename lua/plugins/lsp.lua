@@ -45,7 +45,13 @@ return {
   {
     "neovim-treesitter/nvim-treesitter",
     name = "nvim-treesitter",
-    dependencies = { "neovim-treesitter/treesitter-parser-registry" },
+    dependencies = {
+      "neovim-treesitter/treesitter-parser-registry",
+      {
+        "williamboman/mason.nvim",
+        enabled = not is_nixos,
+      },
+    },
     lazy = false,
     build = ":TSUpdate",
     init = function()
@@ -83,6 +89,87 @@ return {
     config = function()
       require("nvim-treesitter").setup()
 
+      local function has_c_compiler()
+        return vim.fn.executable("cc") == 1
+          or vim.fn.executable("gcc") == 1
+          or vim.fn.executable("clang") == 1
+      end
+
+      local function install_missing_parsers(missing)
+        if not has_c_compiler() then
+          vim.notify_once(
+            "A C compiler is required to install or update Treesitter parsers",
+            vim.log.levels.WARN
+          )
+          return
+        end
+
+        require("nvim-treesitter").install(missing)
+      end
+
+      local function ensure_treesitter_cli(callback)
+        if vim.fn.executable("tree-sitter") == 1 then
+          callback()
+          return
+        end
+
+        if #vim.api.nvim_list_uis() == 0 then
+          return
+        end
+
+        if is_nixos then
+          vim.notify_once(
+            "tree-sitter CLI is required to install or update parsers; provide it through your Nix system or dev environment before running :TSUpdate",
+            vim.log.levels.WARN
+          )
+          return
+        end
+
+        local mason_ok, mason = pcall(require, "mason")
+        local registry_ok, registry = pcall(require, "mason-registry")
+        if not mason_ok or not registry_ok then
+          vim.notify_once(
+            "tree-sitter CLI is required to install or update parsers; install tree-sitter-cli or enable mason.nvim",
+            vim.log.levels.WARN
+          )
+          return
+        end
+
+        mason.setup()
+        registry.refresh(function()
+          local package_ok, package = pcall(registry.get_package, "tree-sitter-cli")
+          if not package_ok then
+            vim.notify_once(
+              "Mason registry does not include tree-sitter-cli; install tree-sitter-cli before running :TSUpdate",
+              vim.log.levels.WARN
+            )
+            return
+          end
+
+          if package:is_installed() then
+            callback()
+            return
+          end
+
+          if package:is_installing() then
+            vim.notify_once("tree-sitter-cli is already being installed by Mason", vim.log.levels.INFO)
+            return
+          end
+
+          vim.notify_once("Installing tree-sitter-cli with Mason for Treesitter parser updates", vim.log.levels.INFO)
+          package:install({}, function(success, error)
+            if success then
+              callback()
+            else
+              vim.notify(
+                "Failed to install tree-sitter-cli with Mason: " .. tostring(error),
+                vim.log.levels.WARN
+              )
+            end
+          end)
+        end)
+      end
+
       local installed = require("nvim-treesitter.config").get_installed()
       local missing = vim.iter(treesitter_parsers)
           :filter(function(parser)
@@ -90,19 +177,15 @@ return {
           end)
           :totable()
 
-      if #missing == 0 then
+      if #missing == 0 and (is_nixos or #vim.api.nvim_list_uis() == 0) then
         return
       end
 
-      if vim.fn.executable("tree-sitter") == 0 then
-        vim.notify_once(
-          "tree-sitter CLI is required to install or update parsers; enter a Nix shell that provides tree-sitter before running :TSUpdate",
-          vim.log.levels.WARN
-        )
-        return
-      end
-
-      require("nvim-treesitter").install(missing)
+      ensure_treesitter_cli(function()
+        if #missing > 0 then
+          install_missing_parsers(missing)
+        end
+      end)
     end
   },
 

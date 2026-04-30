@@ -1,11 +1,7 @@
 -- Neovim 0.11+ LSP configuration
 -- Uses nvim-lspconfig for server definitions + vim.lsp.enable() API
 
--- Detect NixOS (Mason doesn't work on NixOS due to FHS issues)
-local is_nixos = vim.fn.filereadable("/etc/NIXOS") == 1
-
--- Servers to ensure are installed via Mason (non-NixOS only)
--- On NixOS, install these via extraPackages or per-project devShells
+-- Servers to ensure are installed via Mason.
 local mason_ensure_installed = {
   "lua_ls",       -- Neovim config
   "nil_ls",       -- Nix (nixd not available in Mason)
@@ -47,10 +43,7 @@ return {
     name = "nvim-treesitter",
     dependencies = {
       "neovim-treesitter/treesitter-parser-registry",
-      {
-        "williamboman/mason.nvim",
-        enabled = not is_nixos,
-      },
+      "williamboman/mason.nvim",
     },
     lazy = false,
     build = ":TSUpdate",
@@ -107,21 +100,30 @@ return {
         require("nvim-treesitter").install(missing)
       end
 
+      local function tree_sitter_cli_works()
+        if vim.fn.executable("tree-sitter") == 0 then
+          return false
+        end
+
+        local result = vim.system({ "tree-sitter", "--version" }, { text = true }):wait()
+        if result.code == 0 then
+          return true
+        end
+
+        vim.notify_once(
+          "tree-sitter CLI is installed but cannot run. On NixOS, enable nix-ld so Mason-installed binaries can execute.",
+          vim.log.levels.WARN
+        )
+        return false
+      end
+
       local function ensure_treesitter_cli(callback)
-        if vim.fn.executable("tree-sitter") == 1 then
+        if tree_sitter_cli_works() then
           callback()
           return
         end
 
         if #vim.api.nvim_list_uis() == 0 then
-          return
-        end
-
-        if is_nixos then
-          vim.notify_once(
-            "tree-sitter CLI is required to install or update parsers; provide it through your Nix system or dev environment before running :TSUpdate",
-            vim.log.levels.WARN
-          )
           return
         end
 
@@ -147,7 +149,9 @@ return {
           end
 
           if package:is_installed() then
-            callback()
+            if tree_sitter_cli_works() then
+              callback()
+            end
             return
           end
 
@@ -158,7 +162,7 @@ return {
 
           vim.notify_once("Installing tree-sitter-cli with Mason for Treesitter parser updates", vim.log.levels.INFO)
           package:install({}, function(success, error)
-            if success then
+            if success and tree_sitter_cli_works() then
               callback()
             else
               vim.notify(
@@ -177,7 +181,7 @@ return {
           end)
           :totable()
 
-      if #missing == 0 and (is_nixos or #vim.api.nvim_list_uis() == 0) then
+      if #missing == 0 and #vim.api.nvim_list_uis() == 0 then
         return
       end
 
@@ -248,17 +252,16 @@ return {
     end
   },
 
-  -- Mason: portable LSP installer (disabled on NixOS where it doesn't work)
+  -- Mason: portable LSP installer. On NixOS this requires nix-ld for
+  -- downloaded Linux binaries to run.
   {
     "williamboman/mason.nvim",
-    enabled = not is_nixos,
     config = function()
       require("mason").setup()
     end
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    enabled = not is_nixos,
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({

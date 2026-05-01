@@ -172,7 +172,7 @@ return {
         end)
       end
 
-      local installed = require("nvim-treesitter.config").get_installed()
+      local installed = require("nvim-treesitter.info").installed_parsers()
       local missing = vim.iter(treesitter_parsers)
           :filter(function(parser)
             return not vim.tbl_contains(installed, parser)

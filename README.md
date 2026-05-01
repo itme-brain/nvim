@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-Portable Neovim configuration using lazy.nvim, Mason-managed tooling, native LSP, Treesitter, Telescope, and DAP (Neovim 0.11+, tested on 0.12.1).
+Portable Neovim configuration using lazy.nvim, Mason-managed tooling, native LSP, native Treesitter, Telescope, and DAP (Neovim 0.11+, tested on 0.12.1).
 
 ## Installation
 
@@ -19,8 +19,8 @@ git clone --recurse-submodules git@github.com:itme-brain/nixos.git
 - **Native LSP** (`vim.lsp.config` / `vim.lsp.enable`) - no manual server list needed
 - **Smart LSP picker** (`<leader>css`) - auto-detects installed servers for current filetype
 - **Neovim 0.12 compatible** - uses built-in `:lsp` commands and keeps legacy `:Lsp*` aliases working
-- **Portable** - Mason is the source of truth for LSP servers, debug adapters, and tree-sitter-cli
-- **Treesitter** - starts via Neovim's native `vim.treesitter.start`
+- **Portable** - Mason is the source of truth for LSP servers and debug adapters
+- **Treesitter** - uses Neovim's native `vim.treesitter.*` APIs without `nvim-treesitter`
 - **Debugging** - lazy-loaded `nvim-dap` stack with Mason-managed adapters
 
 ## LSP Setup
@@ -43,10 +43,14 @@ On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the 
 
 ## Treesitter
 
-Treesitter uses the current `nvim-treesitter` main branch API:
-- Parsers are installed with `nvim-treesitter`
+Treesitter uses Neovim's native API:
 - Highlighting starts through `vim.treesitter.start`
-- `tree-sitter-cli` is bootstrapped through Mason when needed for parser installs/updates
+- Parser/filetype mappings use `vim.treesitter.language.register`
+- Parser and query installation is intentionally outside lazy.nvim and Mason
+
+Neovim loads compiled parser libraries from `parser/` directories on `runtimepath` and query files from `queries/<language>/`.
+`tree-sitter-cli` is only needed by tools that generate or compile parsers from grammar sources; it is not required at runtime for highlighting.
+Prefer providing parsers and queries through Neovim's runtime or a reproducible system/development environment.
 
 ## Debugging
 
@@ -94,7 +98,7 @@ Mason installs:
 - **nvim-lspconfig** - LSP configurations
 - **nvim-cmp** - completion
 - **telescope.nvim** - fuzzy finder
-- **nvim-treesitter** - syntax highlighting
+- **Native Treesitter** - syntax highlighting
 - **nvim-dap** - debug adapter client
 - **nvim-dap-ui** - debugging UI panes
 - **mason-nvim-dap.nvim** - Mason debug adapter integration

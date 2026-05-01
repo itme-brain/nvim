@@ -4,7 +4,7 @@
 -- Servers to ensure are installed via Mason.
 local mason_ensure_installed = {
   "lua_ls",       -- Neovim config
-  "nil_ls",       -- Nix (nixd not available in Mason)
+  "clangd",       -- C/C++
   "bashls",       -- Shell scripts
   "jsonls",       -- JSON configs
   "html",         -- HTML
@@ -25,9 +25,7 @@ local treesitter_parsers = {
   "markdown",
   "markdown_inline",
   "html",
-  "html_tags",
   "javascript",
-  "jsx",
   "css",
   "vim",
   "git_config",
@@ -214,6 +212,25 @@ return {
         ensure_installed = mason_ensure_installed,
         automatic_installation = false,  -- Only install what's in ensure_installed
       })
+
+      local registry_ok, registry = pcall(require, "mason-registry")
+      if not registry_ok then
+        return
+      end
+
+      registry.refresh(function()
+        local package_ok, package = pcall(registry.get_package, "nil")
+        if not package_ok then
+          vim.notify_once("Mason registry does not include nil", vim.log.levels.WARN)
+          return
+        end
+
+        if package:is_installed() or package:is_installing() then
+          return
+        end
+
+        package:install()
+      end)
     end
   },
 

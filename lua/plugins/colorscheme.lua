@@ -10,6 +10,10 @@ return {
       vim.cmd.colorscheme("anticuus")
 
       local highlights = {
+        Normal      = { bg = "NONE" },
+        NormalNC    = { bg = "NONE" },
+        EndOfBuffer = { bg = "NONE" },
+
         Comment    = { fg = "#5a5a5a", italic = true },
         ["@comment"] = { fg = "#5a5a5a", italic = true },
 

@@ -95,7 +95,7 @@ return {
           return
         end
 
-        require("nvim-treesitter").install(missing)
+        require("nvim-treesitter.install").ensure_installed(missing)
       end
 
       local function tree_sitter_cli_works()

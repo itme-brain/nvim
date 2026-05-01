@@ -76,7 +76,8 @@ return {
       })
     end,
     config = function()
-      require("nvim-treesitter").setup()
+      local treesitter = require("nvim-treesitter")
+      treesitter.setup()
 
       local function has_c_compiler()
         return vim.fn.executable("cc") == 1
@@ -93,7 +94,7 @@ return {
           return
         end
 
-        require("nvim-treesitter.install").ensure_installed(missing)
+        treesitter.install(missing)
       end
 
       local function tree_sitter_cli_works()
@@ -170,14 +171,14 @@ return {
         end)
       end
 
-      local installed = require("nvim-treesitter.info").installed_parsers()
+      local installed = treesitter.get_installed("parsers")
       local missing = vim.iter(treesitter_parsers)
           :filter(function(parser)
             return not vim.tbl_contains(installed, parser)
           end)
           :totable()
 
-      if #missing == 0 and #vim.api.nvim_list_uis() == 0 then
+      if #missing == 0 then
         return
       end
 

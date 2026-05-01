@@ -20,7 +20,7 @@ git clone --recurse-submodules git@github.com:itme-brain/nixos.git
 - **Smart LSP picker** (`<leader>css`) - auto-detects installed servers for current filetype
 - **Neovim 0.12 compatible** - uses built-in `:lsp` commands and keeps legacy `:Lsp*` aliases working
 - **Portable** - Mason is the source of truth for LSP servers and debug adapters
-- **Treesitter** - uses Neovim's native `vim.treesitter.*` APIs without `nvim-treesitter`
+- **Treesitter** - uses native `vim.treesitter.*` APIs with community fork provisioning
 - **Debugging** - lazy-loaded `nvim-dap` stack with Mason-managed adapters
 
 ## LSP Setup
@@ -46,11 +46,11 @@ On Neovim 0.12+, start/stop/restart uses the built-in `:lsp` commands under the 
 Treesitter uses Neovim's native API:
 - Highlighting starts through `vim.treesitter.start`
 - Parser/filetype mappings use `vim.treesitter.language.register`
-- Parser and query installation is intentionally outside lazy.nvim and Mason
+- Parsers and queries are provisioned by the community `neovim-treesitter/nvim-treesitter` fork
 
 Neovim loads compiled parser libraries from `parser/` directories on `runtimepath` and query files from `queries/<language>/`.
-`tree-sitter-cli` is only needed by tools that generate or compile parsers from grammar sources; it is not required at runtime for highlighting.
-Prefer providing parsers and queries through Neovim's runtime or a reproducible system/development environment.
+`tree-sitter-cli` is only needed by the provisioner when installing or updating parsers; it is not required at runtime for highlighting.
+Mason bootstraps `tree-sitter-cli` when parser installation is needed.
 
 ## Debugging
 
@@ -99,6 +99,7 @@ Mason installs:
 - **nvim-cmp** - completion
 - **telescope.nvim** - fuzzy finder
 - **Native Treesitter** - syntax highlighting
+- **neovim-treesitter** - parser and query provisioning
 - **nvim-dap** - debug adapter client
 - **nvim-dap-ui** - debugging UI panes
 - **mason-nvim-dap.nvim** - Mason debug adapter integration

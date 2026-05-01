@@ -1,37 +1,12 @@
-local treesitter_filetypes = {
-  "lua",
-  "c",
-  "cpp",
-  "python",
-  "nix",
-  "rust",
-  "bash",
-  "markdown",
-  "html",
-  "javascript",
-  "javascriptreact",
-  "css",
-  "vim",
-  "gitconfig",
-  "gitrebase",
-  "gitattributes",
-  "gitcommit",
-  "gitignore",
-}
+local treesitter_languages = require("config.treesitter_languages")
 
-local language_by_filetype = {
-  gitconfig = "git_config",
-  gitrebase = "git_rebase",
-  javascriptreact = "javascript",
-}
-
-for filetype, language in pairs(language_by_filetype) do
+for filetype, language in pairs(treesitter_languages.language_by_filetype) do
   vim.treesitter.language.register(language, filetype)
 end
 
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("config_treesitter", { clear = true }),
-  pattern = treesitter_filetypes,
+  pattern = treesitter_languages.filetypes,
   callback = function(event)
     local language = vim.treesitter.language.get_lang(vim.bo[event.buf].filetype)
     if not language then

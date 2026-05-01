@@ -59,6 +59,7 @@ return {
         { "[d", vim.diagnostic.goto_prev, desc = "Prev Diagnostic" },
 
         { "<leader>G", group = "Git"},
+        { "<leader>a", group = "AI"},
         { "<leader>f", group = "Files"},
         { "<leader>c", group = "Code"},
         { "<leader>d", group = "Debug"},

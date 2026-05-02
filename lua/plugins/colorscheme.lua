@@ -1,9 +1,8 @@
 return {
   {
-    "https://codeberg.org/juanmilkah/anticuus.nvim",
-    name = "anticuus",
+    dir = vim.fn.stdpath("config"),
+    name = "local-colorscheme",
     lazy = false,
-    priority = 1000,
     config = function()
       local color_group = vim.api.nvim_create_augroup("config_colorscheme", { clear = true })
 

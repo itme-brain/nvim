@@ -14,6 +14,12 @@ git clone git@github.com:itme-brain/nvim.git ~/.config/nvim
 git clone --recurse-submodules git@github.com:itme-brain/nixos.git
 ```
 
+## Plugin Lockfile
+
+This config does not commit `lazy-lock.json`.
+
+When Home Manager deploys this config from a flake, `~/.config/nvim` can point into `/nix/store`, which is read-only. lazy.nvim normally writes its lockfile to `stdpath("config")`, so this config stores the runtime lockfile at `stdpath("state") .. "/lazy-lock.json"` instead.
+
 ## Features
 
 - **Native LSP** (`vim.lsp.config` / `vim.lsp.enable`) - no manual server list needed

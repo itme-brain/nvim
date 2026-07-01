@@ -1,6 +1,9 @@
 return {
   {
     "pablopunk/pi.nvim",
+    cond = function()
+      return vim.fn.executable("pi") == 1
+    end,
     config = function()
       require("pi").setup({
         log_path = vim.fn.stdpath("state") .. "/pi-nvim.log",

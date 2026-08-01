@@ -1,12 +1,20 @@
-local function get_root()
-  local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
+local function search_opts(files)
+  local cwd = vim.fn.getcwd()
+  local result = vim.system({ "git", "-C", cwd, "rev-parse", "--show-toplevel" }, { text = true }):wait()
   if result.code == 0 and result.stdout then
-    local git_dir = vim.trim(result.stdout)
-    if git_dir ~= "" then
-      return git_dir
+    local git_root = vim.trim(result.stdout)
+    if git_root ~= "" then
+      cwd = git_root
     end
   end
-  return vim.fn.getcwd()
+
+  local opts = { cwd = cwd }
+  if files then
+    -- Force the file picker to use ripgrep too. Unlike `git ls-files`, rg walks
+    -- into checked-out submodules while still respecting ignore files.
+    opts.raw_cmd = [[rg --color=never --files --hidden -g "!.git" -g "!.jj"]]
+  end
+  return opts
 end
 
 -- Close oil first so picker actions land in a normal window, not oil's float.
@@ -48,8 +56,8 @@ return {
       fzf.register_ui_select()
 
       require("which-key").add({
-        { "<leader>/",  pick(function() fzf.live_grep({ cwd = get_root() }) end), desc = "grep" },
-        { "<leader>ff", pick(function() fzf.files({ cwd = get_root() }) end),     desc = "Search for Files" },
+        { "<leader>/",  pick(function() fzf.live_grep(search_opts()) end), desc = "grep" },
+        { "<leader>ff", pick(function() fzf.files(search_opts(true)) end),  desc = "Search for Files" },
         { "<leader>fp", pick(fzf.oldfiles),                                       desc = "Oldfiles" },
         { "<leader>bf",
           pick(function()

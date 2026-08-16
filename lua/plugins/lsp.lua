@@ -27,7 +27,11 @@ return {
   {
     "williamboman/mason.nvim",
     config = function()
-      require("mason").setup()
+      -- Prefer tools supplied by the active project environment. Mason's
+      -- installations remain available as fallbacks outside a dev shell.
+      require("mason").setup({
+        PATH = "append",
+      })
     end
   },
   {

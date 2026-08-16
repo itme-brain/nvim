@@ -26,7 +26,9 @@ local function ensure_tree_sitter_cli(callback)
     return
   end
 
-  mason.setup()
+  mason.setup({
+    PATH = "append",
+  })
   registry.refresh(function()
     local package_ok, package = pcall(registry.get_package, "tree-sitter-cli")
     if not package_ok then

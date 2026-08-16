@@ -73,7 +73,9 @@ return {
     config = function()
       local dap = require("dap")
 
-      require("mason").setup()
+      require("mason").setup({
+        PATH = "append",
+      })
       require("mason-nvim-dap").setup({
         ensure_installed = dap_adapters,
         automatic_installation = false,

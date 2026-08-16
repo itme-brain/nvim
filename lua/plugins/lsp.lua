@@ -149,6 +149,14 @@ return {
       })
 
       -- Server-specific settings (merged with lspconfig defaults)
+      local clangd_cmd = { 'clangd' }
+      if vim.env.NIX_CC and vim.env.NIX_CC ~= '' then
+        table.insert(clangd_cmd, '--query-driver=' .. vim.env.NIX_CC .. '/bin/*')
+      end
+      vim.lsp.config.clangd = {
+        cmd = clangd_cmd,
+      }
+
       vim.lsp.config.lua_ls = {
         settings = {
           Lua = {

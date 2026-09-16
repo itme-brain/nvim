@@ -58,33 +58,35 @@ return {
       require("which-key").add({
         { "<leader>/",  pick(function() fzf.live_grep(search_opts()) end), desc = "grep" },
         { "<leader>ff", pick(function() fzf.files(search_opts(true)) end),  desc = "Search for Files" },
-        { "<leader>fp", pick(fzf.oldfiles),                                       desc = "Oldfiles" },
+        { "<leader>fp", pick(fzf.oldfiles), desc = "Oldfiles" },
         { "<leader>bf",
           pick(function()
             fzf.buffers({ sort_lastused = true, ignore_current_buffer = true })
           end),
           desc = "Find Buffer" },
-        { "<leader>?",  pick(fzf.command_history), desc = "Command History" },
+        --{ "<leader>?",  pick(fzf.command_history), desc = "Command History" },
         { "<leader>cm", pick(fzf.manpages),        desc = "Manpages" },
+        { "<leader>?",
+          function()
+            require("fzf-lua").keymaps()
+          end,
+          desc = "Keymaps",
+        },
 
         -- Code
-        { "gd",
+        { "gd", "<C-]>", desc = "Go to Definition", },
+        {
+          "<leader>gd",
           pick(function()
-            local attached = vim.lsp.get_clients({ bufnr = 0 })
-            if next(attached) ~= nil then
-              fzf.lsp_definitions()
-            else
-              vim.api.nvim_feedkeys("gd", "n", false)
-            end
+            fzf.tags({ query = vim.fn.expand("<cword>") })
           end),
-          mode = "n",
-          desc = "Go to Definition" },
-        { "<leader>gd", pick(fzf.lsp_definitions),       desc = "Go to Definition" },
-        { "<leader>gr", pick(fzf.lsp_references),        desc = "Goto References" },
-        { "<leader>gi", pick(fzf.lsp_implementations),   desc = "Go to Implementations" },
-        { "<leader>gt", pick(fzf.lsp_typedefs),          desc = "Go to Type Definition" },
-        { "<leader>cv", pick(fzf.lsp_document_symbols),  desc = "Document Symbols" },
-        { "<leader>cd", pick(fzf.diagnostics_workspace), desc = "Code Diagnostics" },
+          desc = "Find Tag",
+        },
+        { "<leader>gr", pick(fzf.grep_cword), desc = "Find References", },
+        { "<leader>gs", pick(fzf.tags), desc = "Project Symbols", },
+        { "<leader>gb", pick(fzf.btags), desc = "Buffer Symbols", },
+        { "<leader>gj", pick(fzf.tagstack), desc = "Tag Stack", },
+        { "<leader>gq", pick(fzf.quickfix), desc = "Quickfix", },
 
         -- Git
         { "<leader>Gt", pick(fzf.git_branches), desc = "Git Branches" },

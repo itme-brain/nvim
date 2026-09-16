@@ -51,13 +51,6 @@ return {
             end
           end, desc = "Delete Window & Buffer" },
 
-        { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Action" },
-        { "<leader>cr", vim.lsp.buf.rename, desc = "Rename Variable" },
-        { "<leader>ch", vim.lsp.buf.hover, desc = "Hover Info" },
-        { "<leader>ce", vim.diagnostic.open_float, desc = "Show Diagnostic" },
-        { "]d", vim.diagnostic.goto_next, desc = "Next Diagnostic" },
-        { "[d", vim.diagnostic.goto_prev, desc = "Prev Diagnostic" },
-
         { "<leader>G", group = "Git"},
         { "<leader>a", group = "AI"},
         { "<leader>f", group = "Files"},

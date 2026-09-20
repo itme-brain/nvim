@@ -6,8 +6,8 @@ return {
     opts = {
       keymap = {
         preset = "none",
-        ["<C-y>"] = { "select_and_accept" },
-        ["<C-e>"] = { "cancel" },
+        ["<C-y>"] = { "select_and_accept", "fallback" },
+        ["<C-e>"] = { "cancel", "fallback" },
         ["<C-j>"] = { "select_next", "fallback" },
         ["<C-k>"] = { "select_prev", "fallback" },
         ["<C-f>"] = { "scroll_documentation_down", "fallback" },
@@ -23,7 +23,8 @@ return {
         },
       },
       sources = {
-        default = { "lsp", "buffer", "path" },
+        -- Project symbols use native <C-x><C-]> tag completion.
+        default = { "buffer", "path" },
       },
     },
   },

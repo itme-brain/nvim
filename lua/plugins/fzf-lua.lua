@@ -74,7 +74,7 @@ return {
         },
 
         -- Code
-        { "gd", "<C-]>", desc = "Go to Definition", },
+        { "gd", "g<C-]>", desc = "Go to Definition", },
         {
           "<leader>gd",
           pick(function()
@@ -82,7 +82,7 @@ return {
           end),
           desc = "Find Tag",
         },
-        { "<leader>gr", pick(fzf.grep_cword), desc = "Find References", },
+        { "<leader>gr", pick(function() fzf.grep_cword(search_opts()) end), desc = "Find Occurrences", },
         { "<leader>gs", pick(fzf.tags), desc = "Project Symbols", },
         { "<leader>gb", pick(fzf.btags), desc = "Buffer Symbols", },
         { "<leader>gj", pick(fzf.tagstack), desc = "Tag Stack", },
